@@ -33,14 +33,23 @@ const putCat = (req, res) => {
     cat.owner = owner;
     cat.filename = filename;
     cat.birthdate = birthdate;
-    res.json({message: 'Cat updated.', cat});
+    res.json({message: 'Cat item updated.', cat});
   } else {
     res.sendStatus(404);
   }
 };
 
 const deleteCat = (req, res) => {
-  res.sendStatus(200);
+  const cat = findCatById(req.params.id);
+  if (cat) {
+    res.sendStatus(200);
+    const index = listAllCats().indexOf(cat);
+
+    listAllCats().splice(index, 1);
+    res.json({message: 'Cat item deleted.'});
+  } else {
+    res.sendStatus(404);
+  }
 };
 
 export {getCat, getCatById, postCat, putCat, deleteCat};
