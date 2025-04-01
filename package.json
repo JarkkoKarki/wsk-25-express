@@ -19,6 +19,7 @@
   },
   "dependencies": {
     "express": "^4.21.2",
+    "multer": "^1.4.5-lts.2",
     "wsk-25-express": "file:"
   },
   "type": "module"
