@@ -1,5 +1,3 @@
-import multer from 'multer';
-import express from 'express';
 import {
   getCat,
   getCatById,
@@ -7,6 +5,9 @@ import {
   putCat,
   deleteCat,
 } from '../controllers/cat-controller.js';
+import multer from 'multer';
+import express from 'express';
+
 import createThumbnail from '../../middlewares.js';
 
 const catRouter = express.Router();
@@ -20,4 +21,8 @@ catRouter
 
 catRouter.route('/:id').get(getCatById).put(putCat).delete(deleteCat);
 
-export default catRouter;
+const findCatByOwner = async (ownerId) => {
+  //todo:
+};
+
+export default {catRouter, findCatByOwner};
