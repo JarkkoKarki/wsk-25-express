@@ -1,0 +1,17 @@
+### Login oikealla salasanalla
+POST http://localhost:3000/api/v1/auth/login
+Content-Type: application/json
+
+{
+  "username": "Mikko",
+  "password": "salasana"
+}
+
+### Login väärällä salasanalla
+POST http://localhost:3000/api/v1/auth/login
+Content-Type: application/json
+
+{
+  "username": "Mikko",
+  "password": "salasana-väärä"
+}
