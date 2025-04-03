@@ -4,6 +4,7 @@ import {
   postCat,
   putCat,
   deleteCat,
+  getCatByOwnerId,
 } from '../controllers/cat-controller.js';
 import multer from 'multer';
 import express from 'express';
@@ -19,6 +20,8 @@ catRouter
   .post(upload.single('file'), createThumbnail, postCat);
 
 catRouter.route('/:id').get(getCatById).put(putCat).delete(deleteCat);
+
+catRouter.route('/owner/:id').get(getCatByOwnerId);
 /*
 const findCatByOwner = async (ownerId) => {
   //todo:
