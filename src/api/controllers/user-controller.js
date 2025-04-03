@@ -1,4 +1,5 @@
 import {addUser, findUserById, listAllUsers} from '../models/user-model.js';
+import bcrypt from 'bcrypt';
 
 const getUser = (req, res) => {
   res.json(listAllUsers());
@@ -13,6 +14,7 @@ const getUserById = (req, res) => {
   }
 };
 const postUser = (req, res) => {
+  req.body.password = bcrypt.hashSync(req.body.password, 10);
   const result = addUser(req.body);
   if (result.user_id) {
     res.status(201);
