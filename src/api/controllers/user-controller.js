@@ -48,9 +48,9 @@ const postUser = async (req, res) => {
 
 const putUser = async (req, res) => {
   try {
-    const userId = parseInt(req.params.id, 10); // Convert to integer
-    const loggedInUserId = parseInt(res.locals.user.user_id, 10); // Get logged-in user ID
-    const {role} = res.locals.user; // Get user role from token
+    const userId = parseInt(req.params.id, 10);
+    const loggedInUserId = parseInt(res.locals.user.user_id, 10);
+    const {role} = res.locals.user;
 
     if (userId !== loggedInUserId && role !== 'admin') {
       console.log('Authorization failed:', {userId, loggedInUserId, role});

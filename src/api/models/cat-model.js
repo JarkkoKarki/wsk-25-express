@@ -27,7 +27,7 @@ const addCat = async ({cat_name, weight, birthdate, owner, filename}) => {
       birthdate,
       owner,
       filename,
-    }); // Debug log
+    });
 
     const [result] = await promisePool.execute(
       'INSERT INTO wsk_cats (cat_name, weight, birthdate, owner, filename) VALUES (?, ?, ?, ?, ?)',
@@ -46,7 +46,6 @@ const modifyCat = async (cat, id, role, loggedInUserId) => {
   const params = [];
 
   if (role === 'admin') {
-    // Admin can update any cat
     sql = `UPDATE wsk_cats SET cat_name = ?, weight = ?, owner = ?, birthdate = ?, filename = ? WHERE cat_id = ?`;
     params.push(
       cat.cat_name,
@@ -57,7 +56,6 @@ const modifyCat = async (cat, id, role, loggedInUserId) => {
       id
     );
   } else {
-    // Regular users can only update their own cats
     sql = `UPDATE wsk_cats SET cat_name = ?, weight = ?, owner = ?, birthdate = ?, filename = ? WHERE cat_id = ? AND owner = ?`;
     params.push(
       cat.cat_name,

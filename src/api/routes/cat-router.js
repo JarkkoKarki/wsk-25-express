@@ -21,7 +21,7 @@ const upload = multer({dest: 'uploads/'});
 catRouter
   .route('/')
   .get(getCat)
-  .post(authenticateToken, upload.single('file'), createThumbnail, postCat); // Added authenticateToken here
+  .post(authenticateToken, upload.single('file'), createThumbnail, postCat);
 
 catRouter
   .route('/:id')

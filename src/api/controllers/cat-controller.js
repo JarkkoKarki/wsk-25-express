@@ -47,14 +47,13 @@ const getCatById = async (req, res) => {
 
 const postCat = async (req, res) => {
   try {
-    console.log('Incoming request body:', req.body); // Debug log
-    console.log('Uploaded file:', req.file); // Debug log
+    console.log('Incoming request body:', req.body);
+    console.log('Uploaded file:', req.file);
 
     const {cat_name, weight, birthdate} = req.body;
-    const owner = res.locals.user?.user_id; // Get the logged-in user's ID
-    const filename = req.file?.filename; // Get the uploaded file's name
+    const owner = res.locals.user?.user_id;
+    const filename = req.file?.filename;
 
-    // Validate input
     if (!cat_name || !weight || !birthdate || !owner || !filename) {
       console.error('Validation failed:', {
         cat_name,
@@ -66,7 +65,6 @@ const postCat = async (req, res) => {
       return res.status(400).json({error: 'All fields are required'});
     }
 
-    // Add the cat to the database
     const result = await addCat({cat_name, weight, birthdate, owner, filename});
 
     if (result) {
@@ -84,22 +82,19 @@ const putCat = async (req, res) => {
     const {cat_name, weight, owner, birthdate} = req.body;
     const file = req.file;
 
-    // Fetch the existing cat from the database
     const existingCat = await findCatById(req.params.id);
     if (!existingCat) {
       return res.status(404).json({error: 'Cat not found'});
     }
 
-    // Use the existing filename if no new file is uploaded
     const updatedCat = {
       cat_name,
       weight,
       owner,
       birthdate,
-      filename: file ? file.filename : existingCat.filename, // Retain the old filename if no new file
+      filename: file ? file.filename : existingCat.filename,
     };
 
-    // Update the cat in the database
     const result = await modifyCat(
       updatedCat,
       req.params.id,

@@ -73,7 +73,6 @@ const login = async (user) => {
 };
 const createUser = async ({name, username, email, password}) => {
   try {
-    // Check if the username or email already exists
     const [existingUser] = await promisePool.execute(
       'SELECT * FROM wsk_users WHERE username = ? OR email = ?',
       [username, email]
@@ -84,10 +83,9 @@ const createUser = async ({name, username, email, password}) => {
       return {error: 'Username or email already exists'};
     }
 
-    // Insert the new user
     const [result] = await promisePool.execute(
       'INSERT INTO wsk_users (name, username, email, password) VALUES (?, ?, ?, ?)',
-      [name, username, email, password] // Include the 'name' field
+      [name, username, email, password]
     );
 
     return result.affectedRows > 0;
