@@ -6,71 +6,87 @@ import {
 } from '../models/user-model.js';
 import bcrypt from 'bcrypt';
 import {updateUserById} from '../models/user-model.js';
+import {validationResult} from 'express-validator';
 
-const getUser = async (req, res) => {
+const getUser = async (req, res, next) => {
   try {
     const users = await listAllUsers();
     res.json(users);
   } catch (error) {
     console.error('Error in getUser:', error);
-    res.status(500).json({error: 'Server error'});
+    next(error);
   }
 };
 
-const getUserById = async (req, res) => {
+const getUserById = async (req, res, next) => {
   try {
     const user = await findUserById(req.params.id);
     if (user) {
       res.json(user);
     } else {
-      res.status(404).json({error: 'User not found'});
+      const error = new Error('User not found');
+      error.status = 404;
+      next(error);
     }
   } catch (error) {
     console.error('Error in getUserById:', error);
-    res.status(500).json({error: 'Server error'});
+    next(error);
   }
 };
 
-const postUser = async (req, res) => {
+const postUser = async (req, res, next) => {
   try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      const error = new Error('Validation failed');
+      error.status = 400;
+      error.details = errors.array();
+      return next(error);
+    }
+
     req.body.password = bcrypt.hashSync(req.body.password, 10);
     const result = await addUser(req.body);
     if (result && result.user_id) {
       res.status(201).json({message: 'New user added.', result});
     } else {
-      res.status(400).json({error: 'Failed to add user'});
+      const error = new Error('Failed to add user');
+      error.status = 400;
+      next(error);
     }
   } catch (error) {
     console.error('Error in postUser:', error);
-    res.status(500).json({error: 'Server error'});
+    next(error);
   }
 };
 
-const putUser = async (req, res) => {
+const putUser = async (req, res, next) => {
   try {
     const userId = parseInt(req.params.id, 10);
     const loggedInUserId = parseInt(res.locals.user.user_id, 10);
     const {role} = res.locals.user;
 
     if (userId !== loggedInUserId && role !== 'admin') {
-      console.log('Authorization failed:', {userId, loggedInUserId, role});
-      return res
-        .status(403)
-        .json({error: 'You are not authorized to update this user'});
+      const error = new Error('You are not authorized to update this user');
+      error.status = 403;
+      return next(error);
     }
 
     const {email, password, name} = req.body;
 
     if (!email && !password && !name) {
-      return res.status(400).json({
-        error: 'At least one field (email, password, or name) is required',
-      });
+      const error = new Error(
+        'At least one field (email, password, or name) is required'
+      );
+      error.status = 400;
+      return next(error);
     }
 
     const user = await findUserById(userId);
 
     if (!user) {
-      return res.status(404).json({error: 'User not found'});
+      const error = new Error('User not found');
+      error.status = 404;
+      return next(error);
     }
 
     const updatedUser = {email, name};
@@ -83,27 +99,34 @@ const putUser = async (req, res) => {
     if (result) {
       res.status(200).json({message: 'User updated successfully', updatedUser});
     } else {
-      res.status(400).json({error: 'Failed to update user'});
+      const error = new Error('Failed to update user');
+      error.status = 400;
+      next(error);
     }
   } catch (error) {
     console.error('Error in putUser:', error);
-    res.status(500).json({error: 'Internal server error'});
+    next(error);
   }
 };
 
-const deleteUser = async (req, res) => {
+const deleteUser = async (req, res, next) => {
   try {
     const userId = parseInt(req.params.id, 10);
     const loggedInUserId = parseInt(res.locals.user.user_id, 10);
     const {role} = res.locals.user;
+
     if (userId !== loggedInUserId && role !== 'admin') {
-      return res.status(403).json({error: 'cannot delete other users'});
+      const error = new Error('You are not authorized to delete this user');
+      error.status = 403;
+      return next(error);
     }
 
-    const user = await findUserById(userId, role);
+    const user = await findUserById(userId);
 
     if (!user) {
-      return res.status(404).json({error: 'User not found'});
+      const error = new Error('User not found');
+      error.status = 404;
+      return next(error);
     }
 
     const result = await removeUser(userId, role);
@@ -111,11 +134,13 @@ const deleteUser = async (req, res) => {
     if (result) {
       res.json({message: 'User deleted successfully.'});
     } else {
-      res.status(400).json({error: 'Failed to delete user'});
+      const error = new Error('Failed to delete user');
+      error.status = 400;
+      next(error);
     }
   } catch (error) {
     console.error('Error in deleteUser:', error);
-    res.status(500).json({error: 'Server error'});
+    next(error);
   }
 };
 

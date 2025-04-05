@@ -45,24 +45,26 @@ const modifyCat = async (cat, id, role, loggedInUserId) => {
   let sql;
   const params = [];
 
+  console.log('Modify Cat Input:', {cat, id, role, loggedInUserId});
+
   if (role === 'admin') {
-    sql = `UPDATE wsk_cats SET cat_name = ?, weight = ?, owner = ?, birthdate = ?, filename = ? WHERE cat_id = ?`;
+    sql = `UPDATE wsk_cats SET cat_name = ?, weight = ?, owner = ?, birthdate = ?, filename = COALESCE(?, filename) WHERE cat_id = ?`;
     params.push(
-      cat.cat_name,
-      cat.weight,
-      cat.owner,
-      cat.birthdate,
-      cat.filename,
+      cat.cat_name || null,
+      cat.weight || null,
+      cat.owner || null,
+      cat.birthdate || null,
+      cat.filename, // Use COALESCE to retain the existing value if null
       id
     );
   } else {
-    sql = `UPDATE wsk_cats SET cat_name = ?, weight = ?, owner = ?, birthdate = ?, filename = ? WHERE cat_id = ? AND owner = ?`;
+    sql = `UPDATE wsk_cats SET cat_name = ?, weight = ?, owner = ?, birthdate = ?, filename = COALESCE(?, filename) WHERE cat_id = ? AND owner = ?`;
     params.push(
-      cat.cat_name,
-      cat.weight,
-      cat.owner,
-      cat.birthdate,
-      cat.filename,
+      cat.cat_name || null,
+      cat.weight || null,
+      cat.owner || null,
+      cat.birthdate || null,
+      cat.filename, // Use COALESCE to retain the existing value if null
       id,
       loggedInUserId
     );
@@ -71,14 +73,18 @@ const modifyCat = async (cat, id, role, loggedInUserId) => {
   console.log('SQL Query:', sql);
   console.log('Params:', params);
 
-  const [result] = await promisePool.execute(sql, params);
+  try {
+    const [result] = await promisePool.execute(sql, params);
+    console.log('Result:', result);
 
-  console.log('Result:', result);
-
-  if (result.affectedRows === 0) {
-    return false;
+    if (result.affectedRows === 0) {
+      return false;
+    }
+    return {message: 'success'};
+  } catch (error) {
+    console.error('Error in modifyCat:', error);
+    throw error;
   }
-  return {message: 'success'};
 };
 const removeCat = async (id, role, loggedInUserId) => {
   let sql;

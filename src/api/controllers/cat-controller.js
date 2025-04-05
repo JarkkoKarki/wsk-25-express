@@ -7,62 +7,55 @@ import {
   removeCat,
 } from '../models/cat-model.js';
 
-const getCat = async (req, res) => {
+const getCat = async (req, res, next) => {
   try {
     const cats = await listAllCats();
     res.json(cats);
   } catch (error) {
-    console.error('Error in getCat:', error);
-    res.status(500).json({error: 'Internal server error'});
+    next(error);
   }
 };
 
-const getCatByOwnerId = async (req, res) => {
+const getCatByOwnerId = async (req, res, next) => {
   try {
     const cats = await findCatByOwnerId(req.params.id);
     if (cats.length > 0) {
       res.json(cats);
     } else {
-      res.status(404).json({error: 'No cats found for this owner'});
+      const error = new Error('No cats found for this owner');
+      error.status = 404;
+      next(error);
     }
   } catch (error) {
-    console.error('Error in getCatByOwnerId:', error);
-    res.status(500).json({error: 'Internal server error'});
+    next(error);
   }
 };
 
-const getCatById = async (req, res) => {
+const getCatById = async (req, res, next) => {
   try {
     const cat = await findCatById(req.params.id);
     if (cat) {
       res.json(cat);
     } else {
-      res.status(404).json({error: 'Cat not found'});
+      const error = new Error('Cat not found');
+      error.status = 404;
+      next(error);
     }
   } catch (error) {
-    console.error('Error in getCatById:', error);
-    res.status(500).json({error: 'Internal server error'});
+    next(error);
   }
 };
 
-const postCat = async (req, res) => {
+const postCat = async (req, res, next) => {
   try {
-    console.log('Incoming request body:', req.body);
-    console.log('Uploaded file:', req.file);
-
     const {cat_name, weight, birthdate} = req.body;
     const owner = res.locals.user?.user_id;
     const filename = req.file?.filename;
 
     if (!cat_name || !weight || !birthdate || !owner || !filename) {
-      console.error('Validation failed:', {
-        cat_name,
-        weight,
-        birthdate,
-        owner,
-        filename,
-      });
-      return res.status(400).json({error: 'All fields are required'});
+      const error = new Error('All fields are required');
+      error.status = 400;
+      return next(error);
     }
 
     const result = await addCat({cat_name, weight, birthdate, owner, filename});
@@ -70,64 +63,78 @@ const postCat = async (req, res) => {
     if (result) {
       res.status(201).json({message: 'Cat added successfully'});
     } else {
-      res.status(500).json({error: 'Failed to add cat'});
+      const error = new Error('Failed to add cat');
+      error.status = 500;
+      next(error);
     }
   } catch (error) {
-    console.error('Error in postCat:', error);
-    res.status(500).json({error: 'Internal server error'});
+    next(error);
   }
 };
-const putCat = async (req, res) => {
-  try {
-    const {cat_name, weight, owner, birthdate} = req.body;
-    const file = req.file;
 
-    const existingCat = await findCatById(req.params.id);
-    if (!existingCat) {
-      return res.status(404).json({error: 'Cat not found'});
+const putCat = async (req, res, next) => {
+  try {
+    const {cat_name, weight, birthdate, owner} = req.body;
+    const catId = parseInt(req.params.id, 10);
+
+    console.log('Request Body:', req.body);
+    console.log('res.locals.user:', res.locals.user);
+
+    if (!cat_name || !weight || !birthdate || !owner) {
+      const error = new Error(
+        'All fields (cat_name, weight, birthdate, owner) are required'
+      );
+      error.status = 400;
+      return next(error);
     }
 
     const updatedCat = {
       cat_name,
       weight,
-      owner,
       birthdate,
-      filename: file ? file.filename : existingCat.filename,
+      owner,
+      filename: req.file?.filename || null, // Handle file upload
     };
+
+    console.log('Updated Cat Object:', updatedCat);
 
     const result = await modifyCat(
       updatedCat,
-      req.params.id,
+      catId,
       res.locals.user.role,
       res.locals.user.user_id
     );
 
     if (result) {
-      res.status(200).json({message: 'Cat item updated.', updatedCat});
+      res.status(200).json({message: 'Cat updated successfully', updatedCat});
     } else {
-      res.status(400).json({error: 'Failed to update cat'});
+      const error = new Error('Failed to update cat');
+      error.status = 400;
+      return next(error);
     }
   } catch (error) {
     console.error('Error in putCat:', error);
-    res.status(500).json({error: 'Internal server error'});
+    next(error);
   }
 };
 
-const deleteCat = async (req, res) => {
+const deleteCat = async (req, res, next) => {
   try {
     const cat = await findCatById(req.params.id);
 
     if (!cat) {
-      return res.status(404).json({error: 'Cat not found'});
+      const error = new Error('Cat not found');
+      error.status = 404;
+      return next(error);
     }
 
     const loggedInUserId = parseInt(res.locals.user.user_id, 10);
     const {role} = res.locals.user;
 
     if (cat.owner !== loggedInUserId && role !== 'admin') {
-      return res
-        .status(403)
-        .json({error: 'You are not authorized to delete this cat'});
+      const error = new Error('You are not authorized to delete this cat');
+      error.status = 403;
+      return next(error);
     }
 
     const result = await removeCat(req.params.id, role, loggedInUserId);
@@ -135,11 +142,12 @@ const deleteCat = async (req, res) => {
     if (result) {
       res.status(200).json({message: 'Cat item deleted.'});
     } else {
-      res.status(400).json({error: 'Failed to delete cat'});
+      const error = new Error('Failed to delete cat');
+      error.status = 400;
+      next(error);
     }
   } catch (error) {
-    console.error('Error in deleteCat:', error);
-    res.status(500).json({error: 'Internal server error'});
+    next(error);
   }
 };
 
