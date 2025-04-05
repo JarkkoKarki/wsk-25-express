@@ -8,12 +8,16 @@ authRouter.route('/').post(registerUser);
 
 authRouter.route('/login').post(authUser);
 
-authRouter.route('/me').get(authenticateToken, (req, res) => {
-  res.json(req.user);
+authRouter.get('/me', authenticateToken, (req, res) => {
+  res.json(res.locals.user);
 });
 
-authRouter.get('/logout', (req, res) => {
-  res.status(200).json({message: 'Logged out successfully'});
+authRouter.get('/logout', (req, res, next) => {
+  try {
+    res.status(200).json({message: 'Logged out successfully'});
+  } catch (error) {
+    next(error);
+  }
 });
 
 export default authRouter;

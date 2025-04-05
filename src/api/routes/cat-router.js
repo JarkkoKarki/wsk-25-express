@@ -6,7 +6,7 @@ import {
   deleteCat,
   getCatByOwnerId,
 } from '../controllers/cat-controller.js';
-import multer from 'multer';
+import {upload} from '../../middlewares.js';
 import express from 'express';
 import {
   createThumbnail,
@@ -15,8 +15,6 @@ import {
 } from '../../middlewares.js';
 
 const catRouter = express.Router();
-
-const upload = multer({dest: 'uploads/'});
 
 catRouter
   .route('/')
