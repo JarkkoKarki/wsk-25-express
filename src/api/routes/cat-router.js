@@ -8,7 +8,11 @@ import {
 } from '../controllers/cat-controller.js';
 import multer from 'multer';
 import express from 'express';
-import createThumbnail from '../../middlewares.js';
+import {
+  createThumbnail,
+  authenticateToken,
+  checkCatOwnership,
+} from '../../middlewares.js';
 
 const catRouter = express.Router();
 
@@ -17,14 +21,14 @@ const upload = multer({dest: 'uploads/'});
 catRouter
   .route('/')
   .get(getCat)
-  .post(upload.single('file'), createThumbnail, postCat);
+  .post(authenticateToken, upload.single('file'), createThumbnail, postCat); // Added authenticateToken here
 
-catRouter.route('/:id').get(getCatById).put(putCat).delete(deleteCat);
+catRouter
+  .route('/:id')
+  .get(getCatById)
+  .put(authenticateToken, upload.single('file'), checkCatOwnership, putCat)
+  .delete(authenticateToken, checkCatOwnership, deleteCat);
 
 catRouter.route('/owner/:id').get(getCatByOwnerId);
-/*
-const findCatByOwner = async (ownerId) => {
-  //todo:
-};
-*/
+
 export default catRouter;

@@ -3,8 +3,8 @@ POST http://localhost:3000/api/v1/auth/login
 Content-Type: application/json
 
 {
-  "username": "Mikko",
-  "password": "salasana"
+  "username": "admin",
+  "password": "1234"
 }
 
 ### Login väärällä salasanalla
@@ -15,3 +15,141 @@ Content-Type: application/json
   "username": "Mikko",
   "password": "salasana-väärä"
 }
+
+### Register a new user
+POST http://localhost:3000/api/v1/users
+Content-Type: application/json
+
+{
+  "name": "Mikko",
+  "username": "Mikko",
+  "password": "salasana",
+  "email": "mikko@metropolia.fi",
+  "role": "user"
+}
+
+### Post login
+POST http://localhost:3000/api/v1/auth/login
+content-type: application/json
+
+{
+  "username": "Mikko",
+  "password": "salasana"
+}
+
+### Get my user info
+GET http://localhost:3000/api/v1/auth/me
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjozOCwibmFtZSI6Ik1pa2tvIiwidXNlcm5hbWUiOiJNaWtrbyIsImVtYWlsIjoibWlra29AbWV0cm9wb2xpYS5maSIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzQzNjk0NTE1LCJleHAiOjE3NDM3ODA5MTV9.Ls0jQsTR8xfp8ojwpDbHLgnY8lYepuWADamjh19U6xU
+
+
+### Update cat as owner
+
+PUT http://localhost:3000/api/v1/cats/44
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjozOCwibmFtZSI6Ik1pa2tvIiwidXNlcm5hbWUiOiJNaWtrbyIsImVtYWlsIjoibWlra29AbWV0cm9wb2xpYS5maSIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzQzNjk0NTE1LCJleHAiOjE3NDM3ODA5MTV9.Ls0jQsTR8xfp8ojwpDbHLgnY8lYepuWADamjh19U6xU
+Content-Type: application/json
+
+{
+  "cat_name": "Updated Cat Name",
+  "weight": 5.5,
+  "owner": 38,
+  "filename": "updated-cat.jpg",
+  "birthdate": "2023-01-01"
+}
+
+### Update cat not as owner
+
+PUT http://localhost:3000/api/v1/cats/44
+Authorization: Bearer <JWT_TOKEN>
+Content-Type: application/json
+
+{
+  "cat_name": "Updated Cat Name",
+  "weight": 5.5,
+  "owner": 38,
+  "filename": "updated-cat.jpg",
+  "birthdate": "2023-01-01"
+}
+
+
+### Delete cat as owner
+
+DELETE http://localhost:3000/api/v1/cats/44
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjozOCwibmFtZSI6Ik1pa2tvIiwidXNlcm5hbWUiOiJNaWtrbyIsImVtYWlsIjoibWlra29AbWV0cm9wb2xpYS5maSIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzQzNjk0NTE1LCJleHAiOjE3NDM3ODA5MTV9.Ls0jQsTR8xfp8ojwpDbHLgnY8lYepuWADamjh19U6xU
+
+
+### Delete cat not as owner
+DELETE http://localhost:3000/api/v1/cats/44
+Authorization: Bearer <JWT_TOKEN>
+
+### Update user as owner /admin
+
+PUT http://localhost:3000/api/v1/users/42
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJuYW1lIjoiQWRtaW5pc3RyYXRvciIsInVzZXJuYW1lIjoiYWRtaW4iLCJlbWFpbCI6ImFkbWluQG1ldHJvcG9saWEuZmkiLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3NDM3NTg4ODAsImV4cCI6MTc0Mzg0NTI4MH0.WE-7ITWv8vsfWMpiOrPiupL4eBs8pA0isBgoPeaV7W4
+Content-Type: application/json
+
+{
+  "email": "matti@metropolia.fi",
+  "name": "Matti"
+}
+### Update user not as owner
+
+PUT http://localhost:3000/api/v1/users/38
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjozOCwibmFtZSI6Ik1pa2tvIiwidXNlcm5hbWUiOiJNaWtrbyIsImVtYWlsIjoibWlra29AbWV0cm9wb2xpYS5maSIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzQzNjk0NTE1LCJleHAiOjE3NDM3ODA5MTV9.Ls0jQsTR8xfp8ojwpDbHLgnY8lYepuWADamjh19U6xU
+Content-Type: application/json
+
+{
+  "email": "matti@metropolia.fi",
+  "name": "Matti"
+}
+### Delete user as owner /admin
+DELETE http://localhost:3000/api/v1/users/41
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJuYW1lIjoiQWRtaW5pc3RyYXRvciIsInVzZXJuYW1lIjoiYWRtaW4iLCJlbWFpbCI6ImFkbWluQG1ldHJvcG9saWEuZmkiLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3NDM3NTk2MDcsImV4cCI6MTc0Mzg0NjAwN30.2-KMIdXBlj5g4sdCLIR6fwDlRvBhQiWz4Fic5KTsEJ0
+Content-Type: application/json
+
+### Delete user not as owner
+DELETE http://localhost:3000/api/v1/users/38
+Authorization: Bearer <JWT_TOKEN>
+Content-Type: application/json
+
+### Update user as admin
+
+PUT http://localhost:3000/api/v1/users/42
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJuYW1lIjoiQWRtaW5pc3RyYXRvciIsInVzZXJuYW1lIjoiYWRtaW4iLCJlbWFpbCI6ImFkbWluQG1ldHJvcG9saWEuZmkiLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3NDM3NTg4ODAsImV4cCI6MTc0Mzg0NTI4MH0.WE-7ITWv8vsfWMpiOrPiupL4eBs8pA0isBgoPeaV7W4
+Content-Type: application/json
+
+{
+  "email": "adminupdated@example.com"
+}
+
+### Update cat as admin
+
+PUT http://localhost:3000/api/v1/cats/43
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJuYW1lIjoiQWRtaW5pc3RyYXRvciIsInVzZXJuYW1lIjoiYWRtaW4iLCJlbWFpbCI6ImFkbWluQG1ldHJvcG9saWEuZmkiLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3NDM3NTk2MDcsImV4cCI6MTc0Mzg0NjAwN30.2-KMIdXBlj5g4sdCLIR6fwDlRvBhQiWz4Fic5KTsEJ0
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="cat_name"
+
+Updated Cat Name
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="weight"
+
+4.5
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="owner"
+
+1
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="birthdate"
+
+2023-01-01
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="file"; filename="cat.jpg"
+Content-Type: image/png
+
+< ./path/to/cat.jpg
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
+### Delete a cat as admin
+DELETE http://localhost:3000/api/v1/cats/47
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJuYW1lIjoiQWRtaW5pc3RyYXRvciIsInVzZXJuYW1lIjoiYWRtaW4iLCJlbWFpbCI6ImFkbWluQG1ldHJvcG9saWEuZmkiLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3NDM3NTk2MDcsImV4cCI6MTc0Mzg0NjAwN30.2-KMIdXBlj5g4sdCLIR6fwDlRvBhQiWz4Fic5KTsEJ0
+Content-Type: application/json
